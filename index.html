@@ -1,15 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Help with Reading</title>
+</head>
+
 <body>
+  <div class="flipbook">
+    <div class="hard">some book <small>~ some author</small></div>
+    <div class="hard"></div>
+    <div>
+        <p id="demo"></p>
+    </div>
+    <div>
+        <p id="demo2"></p>
+    </div>
+    <div class="hard"></div>
+    <div class="hard">Thank You <small>~ some author</small></div>
+  </div>
 
-<h2>Use JavaScript to Change Text</h2>
-<p>This example writes "Hello JavaScript!" into an HTML element with id="demo":</p>
-
-<p id="demo"></p>
-
-<script>
-document.getElementById("demo").innerHTML = "Hello JavaScript!";
-</script> 
-
+  <script src="jquery.js"></script>
+  <script src="turn.js"></script>
+  <script>
+    $(".flipbook").turn();
+  </script>
+  <script src="js/script.js"></script>
 </body>
+
 </html>
