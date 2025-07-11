@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Help with Reading</title>
+</head>
+
+<body>
+
+    <!--flipbook-->
+    <div class="flipbook" id="flipbook">
+        <div class="hard">some book <small>~ some author</small></div>
+        <div class="hard"></div>
+        <div id="area" style="width: 500px; height: 550px;"></div>
+        <div id="area5" style="width: 500px; height: 550px;"></div>
+        <div class="hard"></div>
+        <div class="hard">Thank You <small>~ some author</small></div>
+    </div>
+
+    <!--debug-->
+    <p id="bouton">debug</p>
+
+    <!--buttons for TTS-->
+    <button onclick="TextToSpeech()">Read these Pages</button>
+
+    <!--scripts-->
+    <script src="js/jquery.js"></script>
+    <script src="js/turn.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="js/epub.min.js"></script>
+    <script src="js/script.js"></script>
+
+    <!--script for testing-->
+    <script>
+        var book = ePub("your-book.epub");
+        var rendition = book.renderTo("area", { manager: "default", width: 500, height: 550, flow: "paginated"});
+        var displayed = rendition.display(5);
+        
+        var rendition2 = book.renderTo("area5", { manager: "default", width: 500, height: 550, flow: "paginated"});
+        var displayed = rendition2.display(5);
+
+    </script>
+    
+</body>
+
+</html>
