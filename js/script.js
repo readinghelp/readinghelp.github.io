@@ -1,33 +1,76 @@
-/**
- * Extracts text between two CFI positions using epub.js, without displaying anything.
- * @param {Book} book - The epub.js Book instance.
- * @param {string} cfiStart - The starting CFI.
- * @param {string} cfiEnd - The ending CFI.
- * @returns {Promise<string>} - Promise resolving to the extracted text.
- */
-async function extractTextBetweenCFIsBackend(book, cfiStart, cfiEnd) {
-    // Find the section for the start CFI
-    const section = book.spine.get(cfiStart);
-    if (!section) throw new Error('Section not found for start CFI.');
+function convertToRangeCfi(startCfi, endCfi) {
+  const cleanStart = startCfi.replace(/^epubcfi\(|\)$/g, '');
+  const cleanEnd = endCfi.replace(/^epubcfi\(|\)$/g, '');
 
-    // Load the section
-    await section.load();
+  const [startBase, startSubpath] = cleanStart.split('!');
+  let [endBase, endSubpath] = cleanEnd.split('!');
 
-    // Try to get the DOM Range using section.cfiRange (most epub.js builds support this)
-    let range;
-    if (typeof section.cfiRange === "function") {
-        range = await section.cfiRange(cfiStart, cfiEnd);
-    } else if (typeof book.getRange === "function") {
-        range = await book.getRange(cfiStart, cfiEnd);
-    } else {
-        throw new Error('No method to get DOM Range from CFIs.');
+  if (startBase !== endBase) {
+    throw new Error("Start and End CFIs are in different spine items.");
+  }
+
+  // Patch: bump the endSubpath to ensure inclusive range
+  const bumpEndCfi = (subpath) => {
+    const parts = subpath.split('/');
+    for (let i = parts.length - 1; i >= 0; i--) {
+      const num = parseInt(parts[i], 10);
+      if (!isNaN(num)) {
+        parts[i] = (num + 2).toString(); // CFI steps are usually even
+        break;
+      }
     }
+    return parts.join('/');
+  };
+  endSubpath = bumpEndCfi(endSubpath);
 
-    if (!range) throw new Error('Unable to create DOM Range from CFIs.');
+  const startParts = startSubpath.split('/');
+  const endParts = endSubpath.split('/');
 
-    // Extract and return the text within the range
-    const text = range.toString().trim();
-    return text;
+  let commonParts = [];
+  for (let i = 0; i < Math.min(startParts.length, endParts.length); i++) {
+    if (startParts[i] === endParts[i]) {
+      commonParts.push(startParts[i]);
+    } else {
+      break;
+    }
+  }
+
+  const commonPath = '/' + commonParts.filter(Boolean).join('/');
+  const startTail = '/' + startParts.slice(commonParts.length).join('/');
+  const endTail = '/' + endParts.slice(commonParts.length).join('/');
+
+  if (!startTail || !endTail) {
+    return `epubcfi(${startBase}!${startSubpath})`; // fallback to single CFI
+  }
+
+  return `epubcfi(${startBase}!${commonPath},${startTail},${endTail})`;
+}
+
+async function textFromCfi() {
+    // Get the current location (CFI range) from the rendition
+    const location = rendition.location;
+    if (location && location.start && location.end) {
+        const startCfi = location.start.cfi;
+        const endCfi = location.end.cfi;
+        console.log(startCfi, endCfi);
+        // Extract base, start, and end using regex
+        cfiRange = convertToRangeCfi(startCfi, endCfi);
+        console.log(cfiRange);
+        try {
+            const range = await book.getRange(cfiRange);
+            const text = range ? range.toString() : '';
+            console.log(text);
+            return text;
+        } catch (error) {
+            console.error('Error fetching text from CFI', error);
+            alert('Error fetching text from CFI');
+            return '';
+        }
+    } else {
+        console.warn("Unable to get current CFI range from rendition.");
+        alert(null);
+        return '';
+    }
 }
 
 function textToSpeech() {
@@ -43,6 +86,8 @@ function textToSpeech() {
             console.warn("unable to access iframe content", e)
         }
     });
+    ////
+    ////
     text = text.trim(); 
     let speech = new SpeechSynthesisUtterance();
     speech.text = text;
@@ -103,11 +148,11 @@ const rendition = book.renderTo("viewer", {
 rendition.themes.default({
     "p": {
     "font-family": "Georgia, serif",
-    "break-inside": "avoid",
-    "page-break-inside": "avoid",
-    "orphans": 2,
-    "widows": 2,
-    "overflow-wrap": "break-word",
+    //"break-inside": "avoid",
+    //"page-break-inside": "avoid",
+    //"orphans": 2,
+    //"widows": 2,
+    //"overflow-wrap": "break-word",
     "text-align": "justify"
     },
     "h1": {
