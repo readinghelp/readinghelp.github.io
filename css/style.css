@@ -10,45 +10,19 @@ body {
   min-height: 800px;
 }
 
-#title {
-  width: 900px;
-  min-height: 18px;
-  margin: 10px auto;
-  text-align: center;
-  font-size: 16px;
-  color: #E2E2E2;
-  font-weight: 400;
-}
-
-#title:hover {
-  color: #777;
-}
-
 #viewer.spreads {
   width: 900px;
   height: 600px;
   box-shadow: 0 0 4px #ccc;
   border-radius: 5px;
   padding: 0;
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   margin: 10px auto;
-  background: white url('ajax-loader.gif') center center no-repeat;
-  top: calc(50vh - 400px);
   
 }
-
-#viewer.spreads .epub-view > iframe {
-    background: white;
-}
-
-#prev {
-  left: 0;
-}
-
-#next {
-  right: 0;
-}
-
 
 @media (min-width: 1000px) {
   #viewer.spreads:after {
@@ -84,7 +58,7 @@ body {
   margin-top: -32px;
   font-size: 64px;
   color: #E2E2E2;
-  font-family: arial, sans-serif;
+  font-family: "Helvetica Neue", arial, sans-serif;
   font-weight: bold;
   cursor: pointer;
   -webkit-user-select: none;
@@ -94,11 +68,11 @@ body {
 }
 
 
-.arrow:hover, .navlink:hover {
+.arrow:hover {
   color: #777;
 }
 
-.arrow:active, .navlink:hover {
+.arrow:active {
   color: #000;
 }
 
@@ -155,17 +129,6 @@ svg {
   stroke: #fff;
 }
 
-#opener {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 10px;
-  stroke: #E2E2E2;
-  fill: #E2E2E2;
-
-}
-
-#opener:hover {
-  stroke: #777;
-  fill: #777;
+.galley-rw {
+  font-family: Georgia, serif;
 }
