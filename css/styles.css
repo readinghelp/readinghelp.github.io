@@ -1,57 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-	font-family: "Poppins", sans-serif;
+* {
+  box-sizing: border-box;
 }
 
 body {
-    display: grid;
-    place-content: center;
-    height: 100vh;
-    width: 100vw;
-	overflow: hidden;
-	background: #f1c40f;
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  margin: 0;
 }
 
-.flipbook {
-    width: 1000px;
-    height: 600px;
+/*links*/
+a:link {
+  color: goldenrod;
+  background-color: transparent;
+  text-decoration: none;
+}
+a:visited {
+  color: goldenrod;
+  background-color: transparent;
+  text-decoration: none;
+}
+a:hover {
+  color: darkgoldenrod;
+  background-color: transparent;
+  text-decoration: none;
+}
+a:active {
+  color: yellow;
+  background-color: transparent;
+  text-decoration: underline;
 }
 
-.flipbook .hard {
-    background: #c0392b !important;
-    color: #fff;
-    font-weight: bold;
-    border: none; 
+/* Style the header */
+.header {
+  padding: 30px;
+  text-align: left;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)), url("IMG_4512.jpeg");
+  background-repeat: no-repeat;
+  position: relative;
+  background-position: center 20%;
+  background-size: cover;
+  color: white;
 }
 
-.flipbook .hard small{
-	font-style: italic;
-	font-weight: lighter;
-	opacity: 0.7;
-	font-size: 14px;
+/* Increase the font size of the h1 element */
+.header h1 {
+  font-size: 100px;
+  font-weight: bold;
+  margin-bottom: -20px;
+  margin-top: -20px
+}
+.header h4 {
+  font-size: 20px;
+  font-weight: 200;
+  margin: 5px;
+}
+/* Style the top navigation bar */
+.navbar {
+  position: sticky;
+  top: 0;
+  overflow: hidden;
+  background-color: #333;
 }
 
-.flipbook .page {
-    background: white;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-    gap: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.11);
+/* Style the navigation bar links */
+.navbar a {
+  float: left;
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 20px;
+  text-decoration: none;
 }
 
-.page img{
-	width: 70%;
-	object-fit: cover;
-	margin: auto;
+/* Right-aligned link */
+.navbar a.right {
+  float: right;
 }
 
-.flipbook .page small{
-	font-size: 14px;
-    margin-bottom: 10px;
+/* Change color on hover */
+.navbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Main column */
+.main {   
+  flex: 85%;
+  background-color: #fafafa;
+  padding: 20px;
+}
+
+
+/* Responsive layout - when the screen is less than 700px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 700px) {
+  .row {   
+    flex-direction: column;
+  }
+}
+
+/* Responsive layout - when the screen is less than 400px wide, make the navigation links stack on top of each other instead of next to each other */
+@media screen and (max-width: 400px) {
+  .navbar a {
+    float: none;
+    width:100%;
+  }
 }

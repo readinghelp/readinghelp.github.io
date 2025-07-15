@@ -1,50 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-    <title>Help with Reading</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EPUB.js Input Example</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+  <script src="js/epub.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="style.css">
+
 </head>
-
 <body>
+  <div id="title">
+    <input type="file" id="input">
+  </div>
+  <div id="viewer" class="spreads"></div>
+  <a id="prev" href="#prev" class="arrow">‹</a>
+  <a id="next" href="#next" class="arrow">›</a>
 
-    <!--debug-->
-    <div id="area"></div>
-    <p id="bouton">debug</p>
-    <button onclick="cfiToRange()">debug 2</button>
-    <!--script for testing-->
-    <script src="js/epub.js"></script>
-    <script>
-        // target: epubcfi(/6/6[item4]!/4/2[pgepubid00003],/2/1:0,/12/1:220)
-        ///////////epubcfi(/6/6[item4]!/4/2[pgepubid00003],/2/1:0,/12/1:220)
-        function cfiToRange() {
-            const startCfi = 'epubcfi(/6/8[item5]!/4/2[pgepubid00004]/22/1:0)';
-            const endCfi =   'epubcfi(/6/8[item5]!/4/2[pgepubid00005]/28/3:386)';
-            let cfiBase;
-            let startRange;
-            let endRange;
-            const i = startCfi.lastIndexOf("]")
-            cfiBase = startCfi.slice(0, i+1);
-            startRange = startCfi.slice(i+1, -1);
-            endRange = endCfi.slice(i+1, -1);
-            const endRangeArr = endRange.split(":");
-            let endNum = parseInt(endRangeArr[1]) + 1;
-            endRange = endRangeArr[0] + ":" + endNum;
-            if (cfiBase === endCfi.slice(0, i+1)) {
-                return `${cfiBase},${startRange},${endRange})`;
-                //document.getElementById("bouton").innerText = `${cfiBase},${startRange},${endRange})`;
-            }
-            else {
-                //test if just using /999/1:1 works
-                return `${cfiBase},${startRange},/999/1:1)`;
-                //document.getElementById("bouton").innerText = `${cfiBase},${startRange},/999/1:1)`;
-            }
+  <script>
+
+  var book = ePub();
+  var rendition;
+
+  var inputElement = document.getElementById("input");
+
+  inputElement.addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (window.FileReader) {
+            var reader = new FileReader();
+            reader.onload = openBook;
+            reader.readAsArrayBuffer(file);
         }
+    });
 
-    </script>
-    
+  function openBook(e){
+    var bookData = e.target.result;
+    //var title = document.getElementById("title");
+    //var next = document.getElementById("next");
+    //var prev = document.getElementById("prev");
+
+    book.open(bookData);
+
+    rendition = book.renderTo("viewer", {
+      width: "100%",
+      height: 600
+    });
+
+    rendition.display();
+
+    rendition.on("keyup", keyListener);
+    rendition.on("relocated", function(location){
+      console.log(location);
+    });
+
+    next.addEventListener("click", function(e){
+      rendition.next();
+      e.preventDefault();
+    }, false);
+
+    prev.addEventListener("click", function(e){
+      rendition.prev();
+      e.preventDefault();
+    }, false);
+
+    var keyListener = function(e){
+
+      // Left Key
+      if ((e.keyCode || e.which) == 37) {
+        rendition.prev();
+      }
+
+      // Right Key
+      if ((e.keyCode || e.which) == 39) {
+        rendition.next();
+      }
+
+    };
+
+
+    document.addEventListener("keyup", keyListener, false);
+  }
+
+
+
+  </script>
+
 </body>
-
 </html>
