@@ -1,124 +1,51 @@
 //////////////////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////
-function convertToRangeCfi(startCfi, endCfi) {
-  const cleanStart = startCfi.replace(/^epubcfi\(|\)$/g, '');
-  const cleanEnd = endCfi.replace(/^epubcfi\(|\)$/g, '');
 
-  const [startBase, startSubpath] = cleanStart.split('!');
-  const [endBase, endSubpath] = cleanEnd.split('!');
-
-  // If CFIs are in different spine items
-  if (startBase !== endBase) {
-    const startParts = startSubpath.split('/');
-    const endParts = endSubpath.split('/');
-
-    // Get common path in startSubpath
-    const commonPartsStart = [];
-    for (let i = 0; i < startParts.length; i++) {
-      if (startParts[i] === '') continue;
-      if (startParts[i].includes(':')) break;
-      commonPartsStart.push(startParts[i]);
-    }
-    const commonPathStart = '/' + commonPartsStart.join('/');
-    const startTail = '/' + startParts.slice(commonPartsStart.length).join('/');
-
-    // Get common path in endSubpath
-    const commonPartsEnd = [];
-    for (let i = 0; i < endParts.length; i++) {
-      if (endParts[i] === '') continue;
-      if (endParts[i].includes(':')) break;
-      commonPartsEnd.push(endParts[i]);
-    }
-    const commonPathEnd = '/' + commonPartsEnd.join('/');
-    const endTail = '/' + endParts.slice(commonPartsEnd.length).join('/');
-
-    const startRange = `epubcfi(${startBase}!${commonPathStart},${startTail},/20:0)`;
-    const endRange = `epubcfi(${endBase}!${commonPathEnd},/0:0,${endTail})`;
-
-    return [startRange, endRange];
+function cfiToRange(start, end) {
+  const startCfi = start;
+  const endCfi = end;
+  let cfiBase;
+  let startRange;
+  let endRange;
+  const i = endCfi.lastIndexOf("]")
+  cfiBase = endCfi.slice(0, i+1);
+  startRange = startCfi.slice(i+1, -1);
+  endRange = endCfi.slice(i+1, -1);
+  const endRangeArr = endRange.split(":");
+  let endNum = parseInt(endRangeArr[1]) + 1;
+  endRange = endRangeArr[0] + ":" + endNum;
+  if (cfiBase === startCfi.slice(0, i+1)) {
+    return `${cfiBase},${startRange},${endRange})`;
+    //document.getElementById("bouton").innerText = `${cfiBase},${startRange},${endRange})`;
   }
-
-  // Same spine item, construct single range
-  const startParts = startSubpath.split('/');
-  const endParts = endSubpath.split('/');
-
-  let commonParts = [];
-  let divergenceIndex = 0;
-
-  for (let i = 0; i < Math.min(startParts.length, endParts.length); i++) {
-    if (startParts[i] === endParts[i]) {
-      commonParts.push(startParts[i]);
-    } else {
-      divergenceIndex = i;
-      break;
-    }
+  else {
+    //test if just using /999/1:1 works (it doesnt)
+    return `${cfiBase},/2/1:0,${endRange})`;
+    //document.getElementById("bouton").innerText = `${cfiBase},${startRange},/999/1:1)`;
   }
-
-  const commonPath = '/' + commonParts.filter(Boolean).join('/');
-  const startTail = '/' + startParts.slice(commonParts.length).join('/');
-  let endTail = '/' + endParts.slice(commonParts.length).join('/');
-
-  if (!startTail || !endTail) {
-    throw new Error("Invalid subpaths for CFI range construction.");
-  }
-
-  let endTails = endTail.split(':');
-  endTails[1] = parseInt(endTails[1]) + 1;
-  endTail = endTails.join(':');
-
-  return `epubcfi(${startBase}!${commonPath},${startTail},${endTail})`;
 }
-
-
 
 async function textFromCfi() {
     // Get the current location from the rendition
     const location = rendition.location;
-    if (location && location.start && location.end) {
-        const startCfi = location.start.cfi;
-        const endCfi = location.end.cfi;
-        console.log(startCfi, endCfi);
-        // Extract base, start, and end using other function
-        cfiRange = convertToRangeCfi(startCfi, endCfi);
-        console.log(cfiRange);
-
-        if (Array.isArray(cfiRange)) {
-          //alert('you ran into that weird case i havent solved yet lol');
-          let output = '';
-          for (let item in cfiRange) {
-            try {
-              const range = await book.getRange(item);
-              let text = range ? range.toString() : '';
-              text = text.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
-              text = text.replace(/(\r\n|\n|\r)/gm, " ");
-              text = text.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-              console.log(text);
-              output += text;
-            } catch (error) {
-                console.error('Error fetching text from CFI', error);
-                alert('Error fetching text from CFI');
-                output += '';
-            }
-            return output;
-          }
-        } else {      
-          try {
-              const range = await book.getRange(cfiRange);
-              let text = range ? range.toString() : '';
-              text = text.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
-              text = text.replace(/(\r\n|\n|\r)/gm, " ");
-              text = text.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-              console.log(text);
-              return text;
-          } catch (error) {
-              console.error('Error fetching text from CFI', error);
-              alert('Error fetching text from CFI');
-              return '';
-          }
-        }
-    } else {
-        console.warn("Unable to get current CFI range from rendition.");
-        alert(null);
-        return '';
+    const startCfi = location.start.cfi;
+    const endCfi = location.end.cfi;
+    console.log(startCfi, endCfi);
+    // Extract base, start, and end using other function
+    cfiRange = cfiToRange(startCfi, endCfi);
+    console.log(cfiRange);
+    try {
+      const range = await book.getRange(cfiRange);
+      console.log(range);
+      let text = range ? range.toString() : '';
+      text = text.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
+      text = text.replace(/(\r\n|\n|\r)/gm, " ");
+      text = text.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
+      //console.log(text);
+      return text;
+    } catch (error) {
+      console.error('Error fetching text from CFI', error);
+      alert('Error fetching text from CFI');
+      return '';
     }
 }
 

@@ -10,37 +10,38 @@
 
 <body>
 
-    <!--flipbook-->
-    <div class="flipbook" id="flipbook">
-        <div class="hard">some book <small>~ some author</small></div>
-        <div class="hard"></div>
-        <div id="area" style="width: 500px; height: 550px;"></div>
-        <div id="area5" style="width: 500px; height: 550px;"></div>
-        <div class="hard"></div>
-        <div class="hard">Thank You <small>~ some author</small></div>
-    </div>
-
     <!--debug-->
+    <div id="area"></div>
     <p id="bouton">debug</p>
-
-    <!--buttons for TTS-->
-    <button onclick="TextToSpeech()">Read these Pages</button>
-
-    <!--scripts-->
-    <script src="js/jquery.js"></script>
-    <script src="js/turn.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
-    <script src="js/epub.min.js"></script>
-    <script src="js/script.js"></script>
-
+    <button onclick="cfiToRange()">debug 2</button>
     <!--script for testing-->
+    <script src="js/epub.js"></script>
     <script>
-        var book = ePub("your-book.epub");
-        var rendition = book.renderTo("area", { manager: "default", width: 500, height: 550, flow: "paginated"});
-        var displayed = rendition.display(5);
-        
-        var rendition2 = book.renderTo("area5", { manager: "default", width: 500, height: 550, flow: "paginated"});
-        var displayed = rendition2.display(5);
+        // target: epubcfi(/6/6[item4]!/4/2[pgepubid00003],/2/1:0,/12/1:220)
+        ///////////epubcfi(/6/6[item4]!/4/2[pgepubid00003],/2/1:0,/12/1:220)
+        function cfiToRange() {
+            const startCfi = 'epubcfi(/6/8[item5]!/4/2[pgepubid00004]/22/1:0)';
+            const endCfi =   'epubcfi(/6/8[item5]!/4/2[pgepubid00005]/28/3:386)';
+            let cfiBase;
+            let startRange;
+            let endRange;
+            const i = startCfi.lastIndexOf("]")
+            cfiBase = startCfi.slice(0, i+1);
+            startRange = startCfi.slice(i+1, -1);
+            endRange = endCfi.slice(i+1, -1);
+            const endRangeArr = endRange.split(":");
+            let endNum = parseInt(endRangeArr[1]) + 1;
+            endRange = endRangeArr[0] + ":" + endNum;
+            if (cfiBase === endCfi.slice(0, i+1)) {
+                return `${cfiBase},${startRange},${endRange})`;
+                //document.getElementById("bouton").innerText = `${cfiBase},${startRange},${endRange})`;
+            }
+            else {
+                //test if just using /999/1:1 works
+                return `${cfiBase},${startRange},/999/1:1)`;
+                //document.getElementById("bouton").innerText = `${cfiBase},${startRange},/999/1:1)`;
+            }
+        }
 
     </script>
     
