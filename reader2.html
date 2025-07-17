@@ -18,11 +18,16 @@
     <a href="reader.html">READER</a>
     <a href="reader2.html">INPUT(BETA)</a>
   </div>
+  <div id="toc-container">
+  <select id="toc" onchange="goToChapter(this)">
+    <option value="">Table of Contents</option>
+  </select>
+  </div>
   <div id="viewer" class="spreads"></div>
   <div id="prev" class="arrow">‹</div>
   <div id="next" class="arrow">›</div>
   <button onclick="textToSpeech()">listen to page</button>
-  <input type="file" id="input"/>
+  <input type="file" id="input" accept=".epub"/>
   <div id="myProgress">
       <div id="myBar">0%</div>
     </div>

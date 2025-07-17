@@ -104,3 +104,17 @@ a:active {
     width:100%;
   }
 }
+
+#toc-container {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+#toc {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
