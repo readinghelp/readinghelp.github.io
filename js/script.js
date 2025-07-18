@@ -1,4 +1,5 @@
 //////////////////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////
+//update: minor issue with not all text on page being spoken - fix using spinendcfi isvalidcfi method
 async function isValidCfi(startcfi, endcfi) {
   if (startcfi == endcfi) {
     let endcfiArr = endcfi.split(":");
