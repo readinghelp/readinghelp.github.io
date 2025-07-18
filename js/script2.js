@@ -1,5 +1,3 @@
-//NOTE: ARROW PAGE TURN SOMETIMES JUMPS 2 PAGES, NEED FIX//
-
 //////////////////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////
 async function isValidCfi(startcfi, endcfi) {
   if (startcfi == endcfi) {
@@ -8,40 +6,33 @@ async function isValidCfi(startcfi, endcfi) {
     let endcfiNum = parseInt(endcfiArr[1]) + 1;
     endcfi = endcfiArr[0] + ":" + endcfiNum + ")";
   }
-  const cfirange = cfiToRange2(startcfi, endcfi);
-  console.log(cfirange);
+  const cfirange = cfiToRange(startcfi, endcfi);
+  //console.log(cfirange);
   try {
     const range = await book.getRange(cfirange);
-    console.log(range);
+    //console.log(range);
     let text = range.toString();
-    console.log(text);
-    if (text.length > 0) {
-      return true;
-    }
+    //console.log(text);
+    if (text.length > 0) { return true; }
     else { return false; }
-  } catch (err) {
-    return false;
-  }
+  } catch (err) { return false; }
 }
 
 async function spineEndCfi(start) {
   const startCfi = start;
   let parent = startCfi.split("!")[0];
-  let endCfi = startCfi.split("!")[1].split("");
-  for (let i = 0; i < startCfi.length; i++) {
-    valid = true;
-    while (endCfi[i] >= '0' && endCfi[i] <= '9' && valid === true) {
-      validcfi = await isValidCfi(startCfi, parent + "!" + endCfi.join(""));
-      console.log(validcfi);
-      if (validcfi == true) {
-        endCfi[i] = parseInt(endCfi[i]) + 2;
-      } else {
-        endCfi[i] = parseInt(endCfi[i]) - 2;
-        valid = false;
-      }
-    }
+  let endCfi = startCfi.split("!")[1];
+  let valid = true;
+  let endcfiArr = endCfi.split(":");
+  endcfiArr[1] = endcfiArr[1].slice(0, -1);
+  let endcfiNum = parseInt(endcfiArr[1]);
+  while (valid == true) {
+    endcfiNum ++ ;
+    endCfi = parent + "!" + endcfiArr[0] + ":" + endcfiNum + ")";
+    valid = await isValidCfi(startCfi, endCfi);
   }
-  return parent + "!" + endCfi.join("");
+  endCfi = endcfiArr[0] + ":" + (endcfiNum-1) + ")";
+  return parent + "!" + endCfi;
 }
 
 function firstListDiff(list1, list2) {
@@ -53,7 +44,7 @@ function firstListDiff(list1, list2) {
   return i;
 }
 
-function cfiToRange2(start, end) {
+function cfiToRange(start, end) {
   const startCfi = start;
   const endCfi = end;
   let cfiBase;
@@ -62,7 +53,7 @@ function cfiToRange2(start, end) {
   let i = firstListDiff(startCfi, endCfi);
   i = Math.max(i, (endCfi.indexOf("!")) + 2);
   i = endCfi.slice(0, i).lastIndexOf("/") + 1
-  console.log(i);
+  //console.log(i);
   cfiBase = endCfi.slice(0, i - 1);
   startRange = startCfi.slice(i - 1, -1).trim();
   endRange = endCfi.slice(i - 1, -1).trim();
@@ -73,7 +64,7 @@ function cfiToRange2(start, end) {
     return `${cfiBase},${startRange},${endRange})`;
   }
   else {
-    return `${cfiBase},/2/1:0,${endRange})`;
+    return `${cfiBase},/2/8:0,${endRange})`;
   }
 }
 
@@ -87,33 +78,42 @@ async function textFromCfi() {
   const startCfi = location.start.cfi;
   const endCfi = location.end.cfi;
 
-  console.log(startCfi, endCfi);
+  //console.log(startCfi, endCfi);
 
   const startSpineId = extractSpineId(startCfi);
   const endSpineId = extractSpineId(endCfi);
 
   if (startSpineId !== endSpineId) {
-    alert('Start and end CFIs are in different spine items.');
-    const cfiRange2 = cfiToRange2(startCfi, endCfi);
+    console.warn('Start and end CFIs are in different spine items.');
+    const cfiRange2 = cfiToRange(startCfi, endCfi);
     const newEndCfi = await spineEndCfi(startCfi);
-    const cfiRange1 = cfiToRange2(startCfi, newEndCfi);
-    console.log(cfiRange2, cfiRange1);
-
+    const cfiRange1 = cfiToRange(startCfi, newEndCfi);
+    //console.log(cfiRange2, cfiRange1);
+    const contents = rendition.getContents();
+    const doc = contents[0].document;
+    let chapter = doc.body.innerText || doc.body.textContent;
+    //console.log(chapter);
     try {
       const range2 = await book.getRange(cfiRange2);
       const range1 = await book.getRange(cfiRange1);
-      console.log(range2, range1);
+      //console.log(range2, range1);
       let text1 = range1 ? range1.toString() : '';
       text1 = text1.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
       text1 = text1.replace(/(\r\n|\n|\r)/gm, " ");
       text1 = text1.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-
+      //console.log(text1);
+      text1 = text1.trim();
+      chapter = chapter.split(text1);
+      text0 = chapter[chapter.length - 1];
+      //console.log(text0);
+      text1 = text1 + text0;
       let text2 = range2 ? range2.toString() : '';
       text2 = text2.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
       text2 = text2.replace(/(\r\n|\n|\r)/gm, " ");
       text2 = text2.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
 
       let text = text1 + "\n" + text2;
+      console.log("text fetched successfully");
       return text;
     } catch (error) {
       console.error('Error fetching text from CFI', error);
@@ -122,16 +122,17 @@ async function textFromCfi() {
     }
   }
 
-  const cfiRange = cfiToRange2(startCfi, endCfi);
-  console.log(cfiRange);
+  const cfiRange = cfiToRange(startCfi, endCfi);
+  //console.log(cfiRange);
 
   try {
     const range = await book.getRange(cfiRange);
-    console.log(range);
+    //console.log(range);
     let text = range ? range.toString() : '';
     text = text.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
     text = text.replace(/(\r\n|\n|\r)/gm, " ");
     text = text.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
+    console.log("text fetched successfully");
     return text;
   } catch (error) {
     console.error('Error fetching text from CFI', error);
@@ -164,10 +165,8 @@ function move(cwidth, nwidth) {
         i = 0;
       } else {
         width = width + 0.01;
-        if ((parseFloat(width) / 0.9877074370006146) <= 100.5) {
-          elem.style.width = (parseFloat(width) / 0.9877074370006146) + "%";
-          elem.innerHTML = parseInt(width / 0.9877074370006146) + "%";
-        }
+        elem.style.width = (parseFloat(width) / 0.9877074370006146) + "%";
+        elem.innerHTML = parseInt(width / 0.9877074370006146) + "%";
       }
     }
   }
@@ -227,9 +226,16 @@ document.querySelector('input').addEventListener('change', (e) => {
   book.ready.then(() => {
     book.locations.generate(100);
     console.log(book.locations);
-    let next = document.getElementById("next");
 
-    next.addEventListener("click", function (e) {
+    const oldNext = document.getElementById("next");
+    const newNext = oldNext.cloneNode(true);
+    oldNext.replaceWith(newNext);
+
+    const oldPrev = document.getElementById("prev");
+    const newPrev = oldPrev.cloneNode(true);
+    oldPrev.replaceWith(newPrev);
+
+    newNext.addEventListener("click", function (e) {
       if (book.package.metadata.direction === "rtl") {
         rendition.prev();
       } else {
@@ -238,8 +244,7 @@ document.querySelector('input').addEventListener('change', (e) => {
       e.preventDefault();
     }, false);
 
-    let prev = document.getElementById("prev");
-    prev.addEventListener("click", function (e) {
+    newPrev.addEventListener("click", function (e) {
       if (book.package.metadata.direction === "rtl") {
         rendition.next();
       } else {
@@ -249,7 +254,6 @@ document.querySelector('input').addEventListener('change', (e) => {
     }, false);
   });
 
-  // TOC (Table of Contents) Dropdown
   book.loaded.navigation.then(function (toc) {
     const tocElement = document.getElementById("toc");
     tocElement.innerHTML = "";
