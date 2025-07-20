@@ -78,7 +78,7 @@ async function cfiToRange(start, end) {
     startCfiArr = startCfi.split(":");
     startCfi = startCfiArr[0] + ":" + offset + ")";
     char = await getCharacterAtCfi(startCfi);
-    console.log(char.length);
+    //console.log(char.length);
   }
   const endCfi = end;
   let cfiBase;
@@ -122,24 +122,24 @@ async function textFromCfi() {
     const cfiRange2 = await cfiToRange(startCfi, endCfi);
     const newEndCfi = await spineEndCfi(startCfi);
     const cfiRange1 = await cfiToRange(startCfi, newEndCfi);
-    console.log(cfiRange2, cfiRange1);
+    //console.log(cfiRange2, cfiRange1);
     const contents = rendition.getContents();
     const doc = contents[0].document;
     let chapter = doc.body.innerText || doc.body.textContent;
-    console.log(chapter);
+    //console.log(chapter);
     try {
       const range2 = await book.getRange(cfiRange2);
       const range1 = await book.getRange(cfiRange1);
-      console.log(range2, range1);
+      //console.log(range2, range1);
       let text1 = range1 ? range1.toString() : '';
       text1 = text1.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
       text1 = text1.replace(/(\r\n|\n|\r)/gm, " ");
       text1 = text1.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-      console.log(text1);
+      //console.log(text1);
       text1 = text1.trim();
       chapter = chapter.split(text1);
       text0 = chapter[chapter.length - 1];
-      console.log(text0);
+      //console.log(text0);
       text1 = text1 + text0;
       let text2 = range2 ? range2.toString() : '';
       text2 = text2.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
@@ -151,13 +151,13 @@ async function textFromCfi() {
       return text;
     } catch (error) {
       console.error('Error fetching text from CFI', error);
-      alert('Error fetching text from CFI');
+      alert('Error fetching text - this is probably a code error');
       return '';
     }
   }
 
   const cfiRange = await cfiToRange(startCfi, endCfi);
-  console.log(cfiRange);
+  //console.log(cfiRange);
 
   try {
     const range = await book.getRange(cfiRange);
@@ -170,7 +170,7 @@ async function textFromCfi() {
     return text;
   } catch (error) {
     console.error('Error fetching text from CFI', error);
-    alert('Error fetching text from CFI');
+    alert('Error fetching text - this is probably a code error');
     return '';
   }
 }
@@ -259,7 +259,7 @@ document.querySelector('input').addEventListener('change', (e) => {
 
   book.ready.then(() => {
     book.locations.generate(100);
-    console.log(book.locations);
+    //console.log(book.locations);
 
     const oldNext = document.getElementById("next");
     const newNext = oldNext.cloneNode(true);

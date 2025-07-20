@@ -117,13 +117,13 @@ async function textFromCfi() {
       return text;
     } catch (error) {
       console.error('Error fetching text from CFI', error);
-      alert('Error fetching text from CFI');
+      alert('Error fetching text - This is probably a code error');
       return '';
     }
   }
 
   const cfiRange = cfiToRange(startCfi, endCfi);
-  console.log(cfiRange);
+  //console.log(cfiRange);
 
   try {
     const range = await book.getRange(cfiRange);
@@ -136,7 +136,7 @@ async function textFromCfi() {
     return text;
   } catch (error) {
     console.error('Error fetching text from CFI', error);
-    alert('Error fetching text from CFI');
+    alert('Error fetching text - this is probably a code error');
     return '';
   }
 }
@@ -218,7 +218,7 @@ let tocList = [];
 
 book.ready.then(() => {
   book.locations.generate(100);
-  console.log(book.locations);
+  //console.log(book.locations);
   let next = document.getElementById("next");
 
   next.addEventListener("click", function (e) {
