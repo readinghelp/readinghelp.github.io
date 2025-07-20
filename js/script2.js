@@ -1,4 +1,27 @@
 //////////////////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////
+async function getCharacterAtCfi(cfi) {
+  try {
+    const range = await book.getRange(cfi);
+    if (!range) {
+      console.warn("Invalid range returned for CFI:", cfi);
+      return null;
+    }
+
+    const containerText = range.startContainer.textContent;
+    const offset = range.startOffset;
+
+    if (containerText && offset < containerText.length) {
+      return containerText.charAt(offset);
+    } else {
+      console.warn("Offset exceeds text length or container is null.");
+      return null;
+    }
+  } catch (err) {
+    console.error("Error getting character at CFI:", err);
+    return null;
+  }
+}
+
 async function isValidCfi(startcfi, endcfi) {
   if (startcfi == endcfi) {
     let endcfiArr = endcfi.split(":");
@@ -6,7 +29,7 @@ async function isValidCfi(startcfi, endcfi) {
     let endcfiNum = parseInt(endcfiArr[1]) + 1;
     endcfi = endcfiArr[0] + ":" + endcfiNum + ")";
   }
-  const cfirange = cfiToRange(startcfi, endcfi);
+  const cfirange = await cfiToRange(startcfi, endcfi);
   //console.log(cfirange);
   try {
     const range = await book.getRange(cfirange);
@@ -44,8 +67,19 @@ function firstListDiff(list1, list2) {
   return i;
 }
 
-function cfiToRange(start, end) {
-  const startCfi = start;
+async function cfiToRange(start, end) {
+  let startCfi = start;
+  let char = "\n"
+  let startCfiArr = startCfi.split(":");
+  let startNum = parseInt(startCfiArr[1].slice(0, startCfiArr[1].length - 1));
+  let offset = startNum - 1;
+  while (/^\s*$/.test(char)) {
+    offset ++;
+    startCfiArr = startCfi.split(":");
+    startCfi = startCfiArr[0] + ":" + offset + ")";
+    char = await getCharacterAtCfi(startCfi);
+    console.log(char.length);
+  }
   const endCfi = end;
   let cfiBase;
   let startRange;
@@ -58,7 +92,7 @@ function cfiToRange(start, end) {
   startRange = startCfi.slice(i - 1, -1).trim();
   endRange = endCfi.slice(i - 1, -1).trim();
   const endRangeArr = endRange.split(":");
-  let endNum = parseInt(endRangeArr[1]) + 1;
+  let endNum = parseInt(endRangeArr[1]) + offset - startNum;
   endRange = endRangeArr[0] + ":" + endNum;
   if (cfiBase === startCfi.slice(0, i - 1)) {
     return `${cfiBase},${startRange},${endRange})`;
@@ -85,27 +119,27 @@ async function textFromCfi() {
 
   if (startSpineId !== endSpineId) {
     console.warn('Start and end CFIs are in different spine items.');
-    const cfiRange2 = cfiToRange(startCfi, endCfi);
+    const cfiRange2 = await cfiToRange(startCfi, endCfi);
     const newEndCfi = await spineEndCfi(startCfi);
-    const cfiRange1 = cfiToRange(startCfi, newEndCfi);
-    //console.log(cfiRange2, cfiRange1);
+    const cfiRange1 = await cfiToRange(startCfi, newEndCfi);
+    console.log(cfiRange2, cfiRange1);
     const contents = rendition.getContents();
     const doc = contents[0].document;
     let chapter = doc.body.innerText || doc.body.textContent;
-    //console.log(chapter);
+    console.log(chapter);
     try {
       const range2 = await book.getRange(cfiRange2);
       const range1 = await book.getRange(cfiRange1);
-      //console.log(range2, range1);
+      console.log(range2, range1);
       let text1 = range1 ? range1.toString() : '';
       text1 = text1.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
       text1 = text1.replace(/(\r\n|\n|\r)/gm, " ");
       text1 = text1.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-      //console.log(text1);
+      console.log(text1);
       text1 = text1.trim();
       chapter = chapter.split(text1);
       text0 = chapter[chapter.length - 1];
-      //console.log(text0);
+      console.log(text0);
       text1 = text1 + text0;
       let text2 = range2 ? range2.toString() : '';
       text2 = text2.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
@@ -122,8 +156,8 @@ async function textFromCfi() {
     }
   }
 
-  const cfiRange = cfiToRange(startCfi, endCfi);
-  //console.log(cfiRange);
+  const cfiRange = await cfiToRange(startCfi, endCfi);
+  console.log(cfiRange);
 
   try {
     const range = await book.getRange(cfiRange);

@@ -4,15 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Reading Helper</title>
-
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
   <script src="js/epub.js"></script>
   <script src="js/script.js"></script>
-
-  <link rel="stylesheet" type="text/css" href="css/style.css">
-  <link rel="stylesheet" type="text/css" href="css/styles.css">
 </head>
-
 <body>
   <div class="navbar">
     <a href="index.html">HOME</a>
@@ -24,13 +20,16 @@
       <option value="">Table of Contents</option>
     </select>
   </div>
-  <div id="viewer" class="spreads"></div>
-  <div id="prev" class="arrow">‹</div>
-  <div id="next" class="arrow">›</div>
-  <button onclick="textToSpeech()">listen to page</button>
   <div id="myProgress">
     <div id="myBar">0%</div>
   </div>
-
+  <div class="viewer-wrapper">
+    <div id="prev" class="arrow">‹</div>
+    <div id="viewer" class="spreads"></div>
+    <div id="next" class="arrow">›</div>
+  </div>
+  <div class="controls">
+    <button onclick="textToSpeech()">listen to page</button>
+  </div>
 </body>
 </html>

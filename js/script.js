@@ -1,5 +1,4 @@
 //////////////////////////////////////////////////////////////FUNCTIONS/////////////////////////////////////////////
-//update: minor issue with not all text on page being spoken - fix using spinendcfi isvalidcfi method
 async function isValidCfi(startcfi, endcfi) {
   if (startcfi == endcfi) {
     let endcfiArr = endcfi.split(":");
@@ -124,7 +123,7 @@ async function textFromCfi() {
   }
 
   const cfiRange = cfiToRange(startCfi, endCfi);
-  //console.log(cfiRange);
+  console.log(cfiRange);
 
   try {
     const range = await book.getRange(cfiRange);
@@ -181,6 +180,10 @@ function goToChapter(selectElement) {
 }
 
 ///////////////////////////////////MAIN CODE//////////////////////////////////////////////
+window.addEventListener('beforeunload', () => {
+  window.speechSynthesis.cancel();
+});
+
 book = ePub("your-book.epub");
 
 const rendition = book.renderTo("viewer", {
@@ -265,15 +268,19 @@ rendition.on("relocated", function (location) {
   let prev = book.package.metadata.direction === "rtl" ? document.getElementById("next") : document.getElementById("prev");
 
   if (location.atEnd) {
-    next.style.visibility = "hidden";
+    next.style.opacity = "0.5";
+    next.style.pointerEvents = "none";
   } else {
-    next.style.visibility = "visible";
+    next.style.opacity = "1";
+    next.style.pointerEvents = "auto";
   }
 
   if (location.atStart) {
-    prev.style.visibility = "hidden";
+    prev.style.opacity = "0.5";
+    prev.style.pointerEvents = "none";
   } else {
-    prev.style.visibility = "visible";
+    prev.style.opacity = "1";
+    prev.style.pointerEvents = "auto";
   }
 
   if (tocList.length > 0 && location.start.href) {
