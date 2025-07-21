@@ -219,13 +219,12 @@ window.addEventListener('beforeunload', () => {
 });
 
 window.addEventListener('DOMContentLoaded', function () {
-  if (window.innerWidth <= 768) { // You can adjust this breakpoint as needed
+  if (window.innerWidth <= 768) {
     const viewer = document.getElementById('viewer');
     viewer.classList.remove('spreads');
   }
 });
 
-// Load the book
 let book;
 let rendition;
 

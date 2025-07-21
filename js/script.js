@@ -185,7 +185,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 window.addEventListener('DOMContentLoaded', function () {
-  if (window.innerWidth <= 768) { // You can adjust this breakpoint as needed
+  if (window.innerWidth <= 768) {
     const viewer = document.getElementById('viewer');
     viewer.classList.remove('spreads');
   }
@@ -248,7 +248,6 @@ book.ready.then(() => {
   }, false);
 });
 
-// TOC (Table of Contents) Dropdown
 book.loaded.navigation.then(function (toc) {
   const tocElement = document.getElementById("toc");
   tocList = toc.toc;
