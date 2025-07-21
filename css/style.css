@@ -6,7 +6,7 @@ html, body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #fff;
   color: #000;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 /* Navbar */
@@ -123,6 +123,15 @@ html, body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   background-color: #fff;
   position: relative;
+}
+
+#viewer {
+  width: 290px;
+  height: 580px;
+  box-shadow: 0 0 4px #ccc;
+  padding: 10px 10px 0px 10px;
+  margin: 5px auto;
+  background: white;
 }
 
 /* Buttons container */

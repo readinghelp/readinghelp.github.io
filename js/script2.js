@@ -214,6 +214,17 @@ function goToChapter(selectElement) {
 }
 
 //////////////////////////////////////////////////MAIN CODE//////////////////////////////////////////////
+window.addEventListener('beforeunload', () => {
+  window.speechSynthesis.cancel();
+});
+
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.innerWidth <= 768) { // You can adjust this breakpoint as needed
+    const viewer = document.getElementById('viewer');
+    viewer.classList.remove('spreads');
+  }
+});
+
 // Load the book
 let book;
 let rendition;
@@ -231,7 +242,7 @@ document.querySelector('input').addEventListener('change', (e) => {
     manager: "continuous",
     flow: "paginated",
     width: "100%",
-    height: 600
+    height: "100%"
   });
 
   rendition.themes.default({
@@ -315,15 +326,19 @@ document.querySelector('input').addEventListener('change', (e) => {
     let prev = book.package.metadata.direction === "rtl" ? document.getElementById("next") : document.getElementById("prev");
 
     if (location.atEnd) {
-      next.style.visibility = "hidden";
+      next.style.opacity = "0.5";
+      next.style.pointerEvents = "none";
     } else {
-      next.style.visibility = "visible";
+      next.style.opacity = "1";
+      next.style.pointerEvents = "auto";
     }
 
     if (location.atStart) {
-      prev.style.visibility = "hidden";
+      prev.style.opacity = "0.5";
+      prev.style.pointerEvents = "none";
     } else {
-      prev.style.visibility = "visible";
+      prev.style.opacity = "1";
+      prev.style.pointerEvents = "auto";
     }
 
     if (tocList.length > 0 && location.start.href) {

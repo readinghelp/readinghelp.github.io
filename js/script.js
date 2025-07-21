@@ -184,13 +184,20 @@ window.addEventListener('beforeunload', () => {
   window.speechSynthesis.cancel();
 });
 
+window.addEventListener('DOMContentLoaded', function () {
+  if (window.innerWidth <= 768) { // You can adjust this breakpoint as needed
+    const viewer = document.getElementById('viewer');
+    viewer.classList.remove('spreads');
+  }
+});
+
 book = ePub("your-book.epub");
 
 const rendition = book.renderTo("viewer", {
   manager: "continuous",
   flow: "paginated",
   width: "100%",
-  height: 600
+  height: "100%"
 });
 
 rendition.themes.default({
