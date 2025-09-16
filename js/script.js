@@ -141,16 +141,16 @@ async function textFromCfi() {
   }
 }
 
-async function textToSpeech() {
-  text = await textFromCfi();
-  console.log(text);
-  let speech = new SpeechSynthesisUtterance();
-  speech.text = text;
-  speech.volume = 1;
-  speech.rate = 0.5;
-  speech.pitch = 10;
-  speechSynthesis.speak(speech);
-}
+// async function textToSpeech() {
+//   text = await textFromCfi();
+//   console.log(text);
+//   let speech = new SpeechSynthesisUtterance();
+//   speech.text = text;
+//   speech.volume = 1;
+//   speech.rate = 0.5;
+//   speech.pitch = 10;
+//   speechSynthesis.speak(speech);
+// }
 
 let i = 0;
 function move(cwidth, nwidth) {
@@ -179,6 +179,91 @@ function goToChapter(selectElement) {
   }
 }
 
+function toggleMenu() {
+  const menu = document.getElementById("custom-menu");
+  menu.style.display = (menu.style.display === "none" ? "block" : "none");
+}
+
+
+// Defaults for TTS (overridden by saved settings)
+let defaultRate = 0.5;
+let defaultPitch = 1;
+let defaultFontSize = 20;
+
+// Load settings after DOM is ready
+window.addEventListener("DOMContentLoaded", () => {
+  // Load saved settings from localStorage
+  const saved = localStorage.getItem("reader-settings");
+  if (saved) {
+    settings = JSON.parse(saved);
+    applySettings();
+  }
+  updateMenuUI();
+
+  // Attach event listeners safely
+  ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", (e) => {
+        document.getElementById(id + "-value").innerText = e.target.value;
+      });
+    }
+  });
+});
+
+function saveSettings() {
+  settings.FontSize = parseInt(document.getElementById("font-size").value);
+  settings.ttsRate = parseFloat(document.getElementById("tts-rate").value);
+  settings.ttsPitch = parseFloat(document.getElementById("tts-pitch").value);
+
+  localStorage.setItem("reader-settings", JSON.stringify(settings));
+  applySettings();
+}
+
+function applySettings() {
+  // Apply font size to epub.js rendition
+  console.log(settings.FontSize);
+  rendition.themes.fontSize(`${settings.FontSize}px`);
+
+  // Update TTS defaults
+  defaultRate = settings.ttsRate;
+  defaultPitch = settings.ttsPitch;
+  defaultFontSize = settings.FontSize;
+}
+
+function updateMenuUI() {
+  const fs = document.getElementById("font-size");
+  const fsVal = document.getElementById("font-size-value");
+  if (fs && fsVal) {
+    fs.value = settings.FontSize;
+    fsVal.innerText = settings.FontSize;
+  }
+
+  const rate = document.getElementById("tts-rate");
+  const rateVal = document.getElementById("tts-rate-value");
+  if (rate && rateVal) {
+    rate.value = settings.ttsRate;
+    rateVal.innerText = settings.ttsRate;
+  }
+
+  const pitch = document.getElementById("tts-pitch");
+  const pitchVal = document.getElementById("tts-pitch-value");
+  if (pitch && pitchVal) {
+    pitch.value = settings.ttsPitch;
+    pitchVal.innerText = settings.ttsPitch;
+  }
+}
+
+// Updated TTS function to use saved settings
+async function textToSpeech() {
+  let text = await textFromCfi();
+  let speech = new SpeechSynthesisUtterance();
+  speech.text = text;
+  speech.volume = 1;
+  speech.rate = defaultRate;
+  speech.pitch = defaultPitch;
+  speechSynthesis.speak(speech);
+}
 ///////////////////////////////////MAIN CODE//////////////////////////////////////////////
 window.addEventListener('beforeunload', () => {
   window.speechSynthesis.cancel();
@@ -200,9 +285,10 @@ const rendition = book.renderTo("viewer", {
   height: "100%"
 });
 
-rendition.themes.default({
+rendition.themes.override({
   "p": {
     "font-family": "Georgia, serif",
+    "font-size": `${defaultFontSize}px`,
     "break-inside": "avoid",
     "page-break-inside": "avoid",
     "orphans": 2,
@@ -215,7 +301,7 @@ rendition.themes.default({
   }
 });
 
-const savedCfi = localStorage.getItem("a-i-w-loc");
+const savedCfi = localStorage.getItem("start-cfi-loc");
 if (savedCfi) {
   rendition.display(savedCfi);
 }
@@ -301,7 +387,7 @@ rendition.on("relocated", function (location) {
   }
 
   if (location && location.start && location.start.cfi) {
-    localStorage.setItem("a-i-w-loc", location.start.cfi);
+    localStorage.setItem("start-cfi-loc", location.start.cfi);
   }
 });
 
