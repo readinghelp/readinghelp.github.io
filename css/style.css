@@ -251,3 +251,69 @@ input[type="file"] {
   background-color: #000;
   color: #fff;
 }
+
+/* Settings page container */
+.settings-container {
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: left;
+  padding: 20px;
+  box-sizing: border-box;
+  max-width: 500px;
+  margin: 0 auto;
+  background-color: #f2f2f2;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* Settings heading */
+.settings-container h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Individual setting rows */
+.setting {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+  width: 100%;
+}
+
+.setting label {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.setting input[type="range"] {
+  width: 100%;
+}
+
+.setting .value {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Save button styled like index buttons */
+.save-button {
+  padding: 12px 20px;
+  background-color: #fff;
+  color: #000;
+  border: 2px solid #000;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 25px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.save-button:hover {
+  background-color: #000;
+  color: #fff;
+}

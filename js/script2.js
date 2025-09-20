@@ -30,12 +30,9 @@ async function isValidCfi(startcfi, endcfi) {
     endcfi = endcfiArr[0] + ":" + endcfiNum + ")";
   }
   const cfirange = await cfiToRange(startcfi, endcfi);
-  //console.log(cfirange);
   try {
     const range = await book.getRange(cfirange);
-    //console.log(range);
     let text = range.toString();
-    //console.log(text);
     if (text.length > 0) { return true; }
     else { return false; }
   } catch (err) { return false; }
@@ -50,11 +47,11 @@ async function spineEndCfi(start) {
   endcfiArr[1] = endcfiArr[1].slice(0, -1);
   let endcfiNum = parseInt(endcfiArr[1]);
   while (valid == true) {
-    endcfiNum ++ ;
+    endcfiNum++;
     endCfi = parent + "!" + endcfiArr[0] + ":" + endcfiNum + ")";
     valid = await isValidCfi(startCfi, endCfi);
   }
-  endCfi = endcfiArr[0] + ":" + (endcfiNum-1) + ")";
+  endCfi = endcfiArr[0] + ":" + (endcfiNum - 1) + ")";
   return parent + "!" + endCfi;
 }
 
@@ -69,16 +66,15 @@ function firstListDiff(list1, list2) {
 
 async function cfiToRange(start, end) {
   let startCfi = start;
-  let char = "\n"
+  let char = "\n";
   let startCfiArr = startCfi.split(":");
   let startNum = parseInt(startCfiArr[1].slice(0, startCfiArr[1].length - 1));
   let offset = startNum - 1;
   while (/^\s*$/.test(char)) {
-    offset ++;
+    offset++;
     startCfiArr = startCfi.split(":");
     startCfi = startCfiArr[0] + ":" + offset + ")";
     char = await getCharacterAtCfi(startCfi);
-    //console.log(char.length);
   }
   const endCfi = end;
   let cfiBase;
@@ -86,8 +82,7 @@ async function cfiToRange(start, end) {
   let endRange;
   let i = firstListDiff(startCfi, endCfi);
   i = Math.max(i, (endCfi.indexOf("!")) + 2);
-  i = endCfi.slice(0, i).lastIndexOf("/") + 1
-  //console.log(i);
+  i = endCfi.slice(0, i).lastIndexOf("/") + 1;
   cfiBase = endCfi.slice(0, i - 1);
   startRange = startCfi.slice(i - 1, -1).trim();
   endRange = endCfi.slice(i - 1, -1).trim();
@@ -112,8 +107,6 @@ async function textFromCfi() {
   const startCfi = location.start.cfi;
   const endCfi = location.end.cfi;
 
-  //console.log(startCfi, endCfi);
-
   const startSpineId = extractSpineId(startCfi);
   const endSpineId = extractSpineId(endCfi);
 
@@ -122,24 +115,19 @@ async function textFromCfi() {
     const cfiRange2 = await cfiToRange(startCfi, endCfi);
     const newEndCfi = await spineEndCfi(startCfi);
     const cfiRange1 = await cfiToRange(startCfi, newEndCfi);
-    //console.log(cfiRange2, cfiRange1);
     const contents = rendition.getContents();
     const doc = contents[0].document;
     let chapter = doc.body.innerText || doc.body.textContent;
-    //console.log(chapter);
     try {
       const range2 = await book.getRange(cfiRange2);
       const range1 = await book.getRange(cfiRange1);
-      //console.log(range2, range1);
       let text1 = range1 ? range1.toString() : '';
       text1 = text1.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
       text1 = text1.replace(/(\r\n|\n|\r)/gm, " ");
       text1 = text1.replace(/(<NEWPARAGRAPH>)/gm, "\n\n");
-      //console.log(text1);
       text1 = text1.trim();
       chapter = chapter.split(text1);
       text0 = chapter[chapter.length - 1];
-      //console.log(text0);
       text1 = text1 + text0;
       let text2 = range2 ? range2.toString() : '';
       text2 = text2.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
@@ -157,11 +145,8 @@ async function textFromCfi() {
   }
 
   const cfiRange = await cfiToRange(startCfi, endCfi);
-  //console.log(cfiRange);
-
   try {
     const range = await book.getRange(cfiRange);
-    //console.log(range);
     let text = range ? range.toString() : '';
     text = text.replace(/(\r\n\r\n|\n\n|\r\r)/gm, " <NEWPARAGRAPH> ");
     text = text.replace(/(\r\n|\n|\r)/gm, " ");
@@ -176,13 +161,13 @@ async function textFromCfi() {
 }
 
 async function textToSpeech() {
-  text = await textFromCfi();
+  let text = await textFromCfi();
   console.log(text);
   let speech = new SpeechSynthesisUtterance();
   speech.text = text;
   speech.volume = 1;
-  speech.rate = 0.5;
-  speech.pitch = 10;
+  speech.rate = settings.ttsRate;
+  speech.pitch = settings.ttsPitch;
   speechSynthesis.speak(speech);
 }
 
@@ -213,6 +198,60 @@ function goToChapter(selectElement) {
   }
 }
 
+//////////////////////////////////////////////////SETTINGS MENU//////////////////////////////////////////////
+let settings = {
+  FontSize: 20,
+  ttsRate: 0.5,
+  ttsPitch: 1,
+  theme: "light"
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("reader-settings");
+  if (saved) settings = JSON.parse(saved);
+  applySettings();
+  updateMenuUI();
+
+  ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", (e) => {
+        document.getElementById(id + "-value").innerText = e.target.value;
+      });
+    }
+  });
+});
+
+function saveSettings() {
+  settings.FontSize = parseInt(document.getElementById("font-size").value);
+  settings.ttsRate = parseFloat(document.getElementById("tts-rate").value);
+  settings.ttsPitch = parseFloat(document.getElementById("tts-pitch").value);
+  localStorage.setItem("reader-settings", JSON.stringify(settings));
+  alert("Settings saved!");
+  applySettings();
+}
+
+function updateMenuUI() {
+  if (document.getElementById("font-size")) {
+    document.getElementById("font-size").value = settings.FontSize;
+    document.getElementById("font-size-value").innerText = settings.FontSize;
+  }
+  if (document.getElementById("tts-rate")) {
+    document.getElementById("tts-rate").value = settings.ttsRate;
+    document.getElementById("tts-rate-value").innerText = settings.ttsRate;
+  }
+  if (document.getElementById("tts-pitch")) {
+    document.getElementById("tts-pitch").value = settings.ttsPitch;
+    document.getElementById("tts-pitch-value").innerText = settings.ttsPitch;
+  }
+}
+
+function applySettings() {
+  if (rendition) {
+    rendition.themes.override("font-size", settings.FontSize + "px");
+  }
+}
+
 //////////////////////////////////////////////////MAIN CODE//////////////////////////////////////////////
 window.addEventListener('beforeunload', () => {
   window.speechSynthesis.cancel();
@@ -234,8 +273,6 @@ document.querySelector('input').addEventListener('change', (e) => {
     rendition.destroy();
   }
   book = ePub(file);
-
-  //book = ePub("your-book.epub");
 
   rendition = book.renderTo("viewer", {
     manager: "continuous",
@@ -263,13 +300,12 @@ document.querySelector('input').addEventListener('change', (e) => {
   if (savedCfi) {
     rendition.display(savedCfi);
   }
-  else {rendition.display();}
+  else { rendition.display(); }
 
   let tocList = [];
 
   book.ready.then(() => {
     book.locations.generate(100);
-    //console.log(book.locations);
 
     const oldNext = document.getElementById("next");
     const newNext = oldNext.cloneNode(true);

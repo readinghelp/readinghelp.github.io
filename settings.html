@@ -10,30 +10,33 @@
   <div class="navbar">
     <a href="index.html">HOME</a>
     <a href="reader.html">READER</a>
-    <a href="reader2.html">INPUT(BETA)</a>
+    <!--<a href="reader2.html">INPUT(BETA)</a>-->
     <a href="settings.html">SETTINGS</a>
   </div>
-  <h2>Reader Settings</h2>
 
-  <!-- Font size -->
-  <label for="font-size">Font size:
-    <input type="range" id="font-size" min="12" max="36" value="16">
-    <span id="font-size-value">16</span>px
-  </label>
+  <div class="settings-container">
+    <h2>Reader Settings</h2>
 
-  <!-- TTS speed -->
-  <label for="tts-rate">TTS speed:
-    <input type="range" id="tts-rate" min="0.2" max="2" step="0.1" value="0.5">
-    <span id="tts-rate-value">0.5</span>x
-  </label>
+    <div class="setting">
+      <label for="font-size">Font size</label>
+      <input type="range" id="font-size" min="12" max="36" value="16">
+      <span class="value"><span id="font-size-value">16</span>px</span>
+    </div>
 
-  <!-- TTS pitch -->
-  <label for="tts-pitch">TTS pitch:
-    <input type="range" id="tts-pitch" min="0" max="2" step="0.1" value="1">
-    <span id="tts-pitch-value">1</span>
-  </label>
+    <div class="setting">
+      <label for="tts-rate">TTS speed</label>
+      <input type="range" id="tts-rate" min="0.2" max="2" step="0.1" value="0.5">
+      <span class="value"><span id="tts-rate-value">0.5</span>x</span>
+    </div>
 
-  <button onclick="saveSettings()">Save Settings</button>
+    <div class="setting">
+      <label for="tts-pitch">TTS pitch</label>
+      <input type="range" id="tts-pitch" min="0" max="2" step="0.1" value="1">
+      <span class="value"><span id="tts-pitch-value">1</span></span>
+    </div>
+
+    <button class="save-button" onclick="saveSettings()">💾 Save Settings</button>
+  </div>
 
   <script>
     let settings = {
@@ -43,15 +46,11 @@
       theme: "light"
     };
 
-    // Load saved settings
     window.addEventListener("DOMContentLoaded", () => {
       const saved = localStorage.getItem("reader-settings");
-      if (saved) {
-        settings = JSON.parse(saved);
-      }
+      if (saved) settings = JSON.parse(saved);
       updateMenuUI();
 
-      // Live preview of values
       ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -66,9 +65,8 @@
       settings.FontSize = parseInt(document.getElementById("font-size").value);
       settings.ttsRate = parseFloat(document.getElementById("tts-rate").value);
       settings.ttsPitch = parseFloat(document.getElementById("tts-pitch").value);
-      settings.theme = document.getElementById("theme").value;
-
       localStorage.setItem("reader-settings", JSON.stringify(settings));
+      alert("Settings saved!");
     }
 
     function updateMenuUI() {
@@ -80,8 +78,6 @@
 
       document.getElementById("tts-pitch").value = settings.ttsPitch;
       document.getElementById("tts-pitch-value").innerText = settings.ttsPitch;
-
-      document.getElementById("theme").value = settings.theme;
     }
   </script>
 </body>
