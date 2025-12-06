@@ -200,7 +200,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   updateMenuUI();
 
-  // Attach event listeners safely
+  // Attach event listeners
   ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -254,7 +254,7 @@ function updateMenuUI() {
   }
 }
 
-// Updated TTS function to use saved settings
+// TTS
 async function textToSpeech() {
   let text = await textFromCfi();
   let speech = new SpeechSynthesisUtterance();
