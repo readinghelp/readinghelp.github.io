@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reading Helper</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="js/epub.js"></script>
+</head>
+<body>
+    <div class="navbar">
+        <a href="index.html">HOME</a>
+        <a href="reader.html">READER</a>
+        <a href="settings.html">SETTINGS</a>
+        <a href="library.html">LIBRARY</a>
+    </div>
+    
+    <div class="container">
+        <div class="upload-box">
+            <h2>Add EPUB</h2>
+            <input type="file" id="fileInput" accept=".epub">
+            <button id="addBook">Add to Library</button>
+        </div>
+        
+        <h2 style="text-align: center;">Your Library</h2>
+        <div id="library" class="library"></div>
+    </div>
+    <script src="js/bookChooser.js"></script>
+</body>
+</html>

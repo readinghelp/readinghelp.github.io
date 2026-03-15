@@ -1,84 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reading Helper</title>
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reading Helper</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="navbar">
-    <a href="index.html">HOME</a>
-    <a href="reader.html">READER</a>
-    <!--<a href="reader2.html">INPUT(BETA)</a>-->
-    <a href="settings.html">SETTINGS</a>
-  </div>
-
-  <div class="settings-container">
-    <h2>Reader Settings</h2>
-
-    <div class="setting">
-      <label for="font-size">Font size</label>
-      <input type="range" id="font-size" min="12" max="36" value="16">
-      <span class="value"><span id="font-size-value">16</span>px</span>
+    <div class="navbar">
+        <a href="index.html">HOME</a>
+        <a href="reader.html">READER</a>
+        <!--<a href="reader2.html">INPUT(BETA)</a>-->
+        <a href="settings.html">SETTINGS</a>
+        <a href="library.html">LIBRARY</a>
     </div>
 
-    <div class="setting">
-      <label for="tts-rate">TTS speed</label>
-      <input type="range" id="tts-rate" min="0.2" max="2" step="0.1" value="0.5">
-      <span class="value"><span id="tts-rate-value">0.5</span>x</span>
+    <div class="settings-container">
+        <h2>Reader Settings</h2>
+
+        <div class="setting">
+            <label for="font-size">Font size</label>
+            <input type="range" id="font-size" min="12" max="36" value="16">
+            <span class="value"><span id="font-size-value">16</span>px</span>
+        </div>
+
+        <div class="setting">
+            <label for="tts-rate">TTS speed</label>
+            <input type="range" id="tts-rate" min="0.2" max="2" step="0.1" value="0.5">
+            <span class="value"><span id="tts-rate-value">0.5</span>x</span>
+        </div>
+
+        <div class="setting">
+            <label for="tts-pitch">TTS pitch</label>
+            <input type="range" id="tts-pitch" min="0" max="2" step="0.1" value="1">
+            <span class="value"><span id="tts-pitch-value">1</span></span>
+        </div>
+
+        <button class="save-button" onclick="saveSettings()">💾 Save Settings</button>
     </div>
 
-    <div class="setting">
-      <label for="tts-pitch">TTS pitch</label>
-      <input type="range" id="tts-pitch" min="0" max="2" step="0.1" value="1">
-      <span class="value"><span id="tts-pitch-value">1</span></span>
-    </div>
+    <script>
+        let settings = {
+            FontSize: 16,
+            ttsRate: 0.5,
+            ttsPitch: 1,
+            theme: "light"
+        };
 
-    <button class="save-button" onclick="saveSettings()">💾 Save Settings</button>
-  </div>
+        window.addEventListener("DOMContentLoaded", () => {
+            const saved = localStorage.getItem("reader-settings");
+            if (saved) settings = JSON.parse(saved);
+            updateMenuUI();
 
-  <script>
-    let settings = {
-      FontSize: 16,
-      ttsRate: 0.5,
-      ttsPitch: 1,
-      theme: "light"
-    };
+            ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener("input", (e) => {
+                        document.getElementById(id + "-value").innerText = e.target.value;
+                    });
+                }
+            });
+        });
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const saved = localStorage.getItem("reader-settings");
-      if (saved) settings = JSON.parse(saved);
-      updateMenuUI();
-
-      ["font-size", "tts-rate", "tts-pitch"].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.addEventListener("input", (e) => {
-            document.getElementById(id + "-value").innerText = e.target.value;
-          });
+        function saveSettings() {
+            settings.FontSize = parseInt(document.getElementById("font-size").value);
+            settings.ttsRate = parseFloat(document.getElementById("tts-rate").value);
+            settings.ttsPitch = parseFloat(document.getElementById("tts-pitch").value);
+            localStorage.setItem("reader-settings", JSON.stringify(settings));
+            alert("Settings saved!");
         }
-      });
-    });
 
-    function saveSettings() {
-      settings.FontSize = parseInt(document.getElementById("font-size").value);
-      settings.ttsRate = parseFloat(document.getElementById("tts-rate").value);
-      settings.ttsPitch = parseFloat(document.getElementById("tts-pitch").value);
-      localStorage.setItem("reader-settings", JSON.stringify(settings));
-      alert("Settings saved!");
-    }
+        function updateMenuUI() {
+            document.getElementById("font-size").value = settings.FontSize;
+            document.getElementById("font-size-value").innerText = settings.FontSize;
 
-    function updateMenuUI() {
-      document.getElementById("font-size").value = settings.FontSize;
-      document.getElementById("font-size-value").innerText = settings.FontSize;
+            document.getElementById("tts-rate").value = settings.ttsRate;
+            document.getElementById("tts-rate-value").innerText = settings.ttsRate;
 
-      document.getElementById("tts-rate").value = settings.ttsRate;
-      document.getElementById("tts-rate-value").innerText = settings.ttsRate;
-
-      document.getElementById("tts-pitch").value = settings.ttsPitch;
-      document.getElementById("tts-pitch-value").innerText = settings.ttsPitch;
-    }
-  </script>
+            document.getElementById("tts-pitch").value = settings.ttsPitch;
+            document.getElementById("tts-pitch-value").innerText = settings.ttsPitch;
+        }
+    </script>
 </body>
 </html>

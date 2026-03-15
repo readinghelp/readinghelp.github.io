@@ -317,3 +317,136 @@ input[type="file"] {
   background-color: #000;
   color: #fff;
 }
+
+/* Page container */
+.library-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Upload section */
+.upload-box {
+  background: #f2f2f2;
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+
+/* Container holding the buttons */
+.book-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Prevent buttons stretching vertically */
+.book-buttons button {
+  flex: 1 1 auto;
+  white-space: nowrap;
+}
+
+/* Delete button variant */
+.delete-button {
+  border-color: #c00000;
+  color: #c00000;
+}
+
+.delete-button:hover {
+  background-color: #c00000;
+  color: white;
+}
+
+/* Delete button variant */
+.sample-button {
+  border-color: #5a5a5a;
+  color: #5a5a5a;
+}
+
+.sample-button:hover {
+  background-color: #5a5a5a;
+  color: white;
+}
+
+/* Responsive tweak */
+@media screen and (max-width: 600px) {
+  .library {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+EPUB Library Grid
+========================= */
+
+.library {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 25px;
+  justify-items: center;
+  margin-top: 20px;
+}
+
+/* Book card */
+.book {
+  width: 140px;
+  text-align: center;
+}
+
+/* Cover container */
+.book-cover-wrapper {
+  position: relative;
+  width: 140px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+/* Cover image */
+.book-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #ddd;
+}
+
+/* Hover overlay */
+.book-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+/* Show overlay on hover */
+.book-cover-wrapper:hover .book-overlay {
+  opacity: 1;
+}
+
+/* Buttons inside overlay */
+.book-overlay button {
+  width: 90px;
+}
+
+/* Title */
+.book-title {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1.3;
+  word-break: break-word;
+}
