@@ -20,26 +20,19 @@ async function extractBookInfo(file){
     await book.ready;
 
     let metadata = {};
-    let coverBlob = null;
+    let coverURL = null;
     try {
         metadata = await book.loaded.metadata;
     } catch {}
 
     try {
         coverURL = await book.coverUrl();
-        if(coverURL){
-            console.log(coverURL)
-            const res = await fetch(coverURL);
-            console.log(res)
-            coverBlob = await res.blob()
-        }
-
     } catch {}
 
     return {
         title: metadata.title || file.name.replace(".epub",""),
         author: metadata.creator || "",
-        cover: coverBlob
+        cover: coverURL
     };
 }
 
@@ -126,8 +119,7 @@ function displayBooks(){
             img.className = "book-cover";
 
             if(book.cover){
-                console.log(book.cover)
-                img.src = URL.createObjectURL(book.cover)
+                img.src = book.cover;
             }
 
             const overlay = document.createElement("div");
